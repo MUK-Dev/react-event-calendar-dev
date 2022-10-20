@@ -1,16 +1,18 @@
-import React, { FC } from 'react';
-import { Grid, Typography, useTheme } from '@mui/material';
+import { FC, useState } from 'react';
+import { Dialog, Grid, Typography, useTheme } from '@mui/material';
 import moment from 'moment';
 
-import { DaysGrid } from './types';
+import { DaysGrid, EventsData } from './types';
+import Event from './Event';
 
 interface Props {
   i: number;
   daysGridLength: number;
   item: DaysGrid;
+  events?: EventsData | undefined;
 }
 
-const Day: FC<Props> = ({ i, daysGridLength, item }) => {
+const Day: FC<Props> = ({ i, daysGridLength, item, events }) => {
   const theme = useTheme();
 
   const getWeekDays = () => [
@@ -65,10 +67,22 @@ const Day: FC<Props> = ({ i, daysGridLength, item }) => {
               : 'transparent',
           borderRadius: '50%',
           padding: '0.5em',
+          marginBottom: '0.1rem',
         }}
       >
         {item.no}
       </Typography>
+      <Grid container>
+        {events?.map((e, i) => (
+          <Event
+            color={e.color}
+            content={e.popupContent}
+            i={i}
+            key={i}
+            title={e.title}
+          />
+        ))}
+      </Grid>
     </Grid>
   );
 };

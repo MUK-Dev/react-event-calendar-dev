@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Paper, Grid, ThemeProvider, createTheme } from '@mui/material';
 import { EventsData, Pallet } from './types';
 import Day from './Day';
@@ -30,6 +30,7 @@ const EventCalendar: FC<Props> = ({
       secondary: {
         main: pallet?.secondary ?? '#9c27b0',
       },
+      divider: pallet?.primary,
     },
   });
 
@@ -43,7 +44,15 @@ const EventCalendar: FC<Props> = ({
         <Grid container>
           {daysGrid?.map((item, i) =>
             item?.no ? (
-              <Day daysGridLength={daysGrid.length} i={i} item={item} key={i} />
+              <Day
+                daysGridLength={daysGrid.length}
+                i={i}
+                item={item}
+                key={i}
+                events={dataSource?.filter((data) =>
+                  item.date.isSame(data?.date, 'day')
+                )}
+              />
             ) : (
               <ExtraDays daysGridLength={daysGrid.length} i={i} key={i} />
             )

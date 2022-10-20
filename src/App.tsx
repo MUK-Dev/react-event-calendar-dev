@@ -1,6 +1,5 @@
 import { Typography } from '@mui/material';
 import moment from 'moment';
-import React from 'react';
 import { EventCalendar } from './Components';
 import { EventsData } from './Components/types';
 
@@ -11,10 +10,9 @@ function App() {
       title: 'First',
       popupContent: (
         <>
-          <Typography>Hello Popup</Typography>
+          <Typography>Hello Popup 1</Typography>
         </>
       ),
-      color: 'white',
       id: '1',
     },
     {
@@ -22,10 +20,9 @@ function App() {
       title: 'Second',
       popupContent: (
         <>
-          <Typography>Hello Popup</Typography>
+          <Typography>Hello Popup 2</Typography>
         </>
       ),
-      color: 'blue',
       id: '2',
     },
     {
@@ -33,10 +30,10 @@ function App() {
       title: 'Third',
       popupContent: (
         <>
-          <Typography>Hello Popup</Typography>
+          <Typography>Hello Popup 3</Typography>
         </>
       ),
-      color: 'black',
+      color: '#000',
       id: '3',
     },
     {
@@ -44,10 +41,10 @@ function App() {
       title: 'Fourth',
       popupContent: (
         <>
-          <Typography>Hello Popup</Typography>
+          <Typography>Hello Popup 4</Typography>
         </>
       ),
-      color: 'yellow',
+      color: '#ffe100',
       id: '4',
     },
   ];
