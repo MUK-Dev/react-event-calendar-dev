@@ -1,157 +1,56 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import moment from 'moment';
-import { IconButton, Stack, Typography, Paper, Grid } from '@mui/material';
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import React, { FC } from 'react';
+import { Paper, Grid, ThemeProvider, createTheme } from '@mui/material';
+import { EventsData, Pallet } from './types';
+import Day from './Day';
+import ExtraDays from './ExtraDays';
+import useEventCalendar from './useEventCalendar';
+import Controls from './Controls';
 
-const EventCalendar = () => {
-  const [date, setDate] = useState(moment());
-  const [daysGrid, setDaysGrid] = useState<number[]>([]);
+interface Props {
+  readonly?: boolean;
+  pallet?: Pallet;
+  elevation?: number;
+  width?: number | string;
+  dataSource?: EventsData;
+}
 
-  const d = useMemo(() => date, [date]);
-
-  useEffect(() => {
-    getMonthDaysGrid();
-  }, [d]);
-
-  const getWeekDays = () => {
-    const weekDays = ['MON.', 'TUE.', 'WED.', 'THU.', 'FRI.', 'SAT.', 'SUN.'];
-
-    return weekDays;
-  };
-
-  const getMonthDaysGrid = () => {
-    let totalNextMonthStartDays: number;
-    const firstDayofMonth = d.clone().startOf('month');
-    const lastDayofMonth = d.clone().endOf('month');
-    const totalLastMonthFinalDays =
-      firstDayofMonth.days() - 1 < 0 ? 6 : firstDayofMonth.days() - 1;
-    if (lastDayofMonth.days() === 1) totalNextMonthStartDays = 6;
-    else if (lastDayofMonth.days() === 2) totalNextMonthStartDays = 5;
-    else if (lastDayofMonth.days() === 3) totalNextMonthStartDays = 4;
-    else if (lastDayofMonth.days() === 4) totalNextMonthStartDays = 3;
-    else if (lastDayofMonth.days() === 5) totalNextMonthStartDays = 2;
-    else if (lastDayofMonth.days() === 6) totalNextMonthStartDays = 1;
-    else totalNextMonthStartDays = 0;
-
-    const totalDays =
-      d.daysInMonth() + totalLastMonthFinalDays + totalNextMonthStartDays;
-    const monthList: number[] = Array.from({ length: totalDays });
-    let counter = 1;
-
-    for (let i = totalLastMonthFinalDays; i < totalDays; i++) {
-      if (i < totalDays - totalNextMonthStartDays) monthList[i] = counter;
-
-      counter++;
-    }
-
-    setDaysGrid(monthList);
-  };
-
-  const changeMonth = (action: string) => {
-    if (action === 'add') {
-      setDate((prevd) => prevd.clone().add(1, 'months'));
-    } else if (action === 'subtract') {
-      setDate((prevd) => prevd.clone().subtract(1, 'months'));
-    }
-  };
-
-  const weekDays = getWeekDays();
+const EventCalendar: FC<Props> = ({
+  readonly = false,
+  pallet,
+  elevation = 0,
+  width = '90%',
+  dataSource,
+}) => {
+  const { changeMonth, date, daysGrid } = useEventCalendar();
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: pallet?.primary ?? '#1976d2',
+      },
+      secondary: {
+        main: pallet?.secondary ?? '#9c27b0',
+      },
+    },
+  });
 
   return (
-    <Paper
-      sx={{ width: '90%', border: '1px solid rgba(0, 0, 0, 0.12)' }}
-      elevation={0}
-    >
-      <Stack
-        direction='row'
-        alignItems='center'
-        padding='0.5em 1em'
-        borderBottom='1px solid rgba(0, 0, 0, 0.12)'
+    <ThemeProvider theme={theme}>
+      <Paper
+        sx={{ width, border: '1px solid rgba(0, 0, 0, 0.12)' }}
+        elevation={elevation}
       >
-        <IconButton
-          aria-label='previous month'
-          onClick={() => changeMonth('subtract')}
-          size='small'
-        >
-          <ArrowBackIos />
-        </IconButton>
-        <Typography variant='body1' aria-label='current month'>
-          {d.format('MMMM, YYYY')}
-        </Typography>
-        <IconButton
-          aria-label='next month'
-          onClick={() => changeMonth('add')}
-          size='small'
-        >
-          <ArrowForwardIos />
-        </IconButton>
-      </Stack>
-      <Grid container>
-        {daysGrid?.map((d, i) =>
-          d ? (
-            <Grid
-              item
-              width={`${100 / 7}%`}
-              borderTop='none'
-              borderRight='none'
-              borderBottom={() => {
-                if (!(i > 7 * Math.floor(daysGrid.length / 7) - 1))
-                  return '1px solid rgb(0, 0, 0, 0.12)';
-              }}
-              borderLeft={() => {
-                if (i % 7 !== 0) return '1px solid rgb(0, 0, 0, 0.12)';
-              }}
-              key={i}
-              textAlign='center'
-              height='8rem'
-            >
-              {i < 7 && (
-                <>
-                  <Typography
-                    variant='caption'
-                    gutterBottom
-                    color='rgb(0, 0, 0, 0.8)'
-                  >
-                    {weekDays[i]}
-                  </Typography>
-                  <br />
-                </>
-              )}
-              <Typography variant='caption' color='rgb(0, 0, 0, 0.8)'>
-                {d}
-              </Typography>
-            </Grid>
-          ) : (
-            <Grid
-              height='8rem'
-              item
-              textAlign='center'
-              width={`${100 / 7}%`}
-              borderTop='none'
-              borderRight='none'
-              borderBottom={() => {
-                if (!(i > 7 * Math.floor(daysGrid.length / 7) - 1))
-                  return '1px solid rgb(0, 0, 0, 0.12)';
-              }}
-              borderLeft={() => {
-                if (i % 7 !== 0) return '1px solid rgb(0, 0, 0, 0.12)';
-              }}
-              key={i}
-            >
-              {i < 7 && (
-                <Typography
-                  variant='caption'
-                  gutterBottom
-                  color='rgb(0, 0, 0, 0.4)'
-                >
-                  {weekDays[i]}
-                </Typography>
-              )}
-            </Grid>
-          )
-        )}
-      </Grid>
-    </Paper>
+        <Controls changeMonth={changeMonth} date={date} />
+        <Grid container>
+          {daysGrid?.map((item, i) =>
+            item?.no ? (
+              <Day daysGridLength={daysGrid.length} i={i} item={item} key={i} />
+            ) : (
+              <ExtraDays daysGridLength={daysGrid.length} i={i} key={i} />
+            )
+          )}
+        </Grid>
+      </Paper>
+    </ThemeProvider>
   );
 };
 
