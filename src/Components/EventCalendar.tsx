@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { createContext, FC, useState } from 'react';
 import { Paper, Grid, ThemeProvider, createTheme } from '@mui/material';
 import { EventsData, Pallet } from './types';
 import Day from './Day';
@@ -12,7 +12,17 @@ interface Props {
   elevation?: number;
   width?: number | string;
   dataSource?: EventsData;
+  onDataChange?: (events: EventsData) => void;
 }
+
+export type CalendarContext = {
+  readonly?: boolean;
+  data?: EventsData;
+  setData?: React.Dispatch<React.SetStateAction<EventsData | undefined>>;
+  onDataChange?: (events: EventsData) => void;
+} | null;
+
+export const EventCalendarContext = createContext<CalendarContext>(null);
 
 const EventCalendar: FC<Props> = ({
   readonly = false,
@@ -20,8 +30,10 @@ const EventCalendar: FC<Props> = ({
   elevation = 0,
   width = '90%',
   dataSource,
+  onDataChange,
 }) => {
   const { changeMonth, date, daysGrid } = useEventCalendar();
+  const [data, setData] = useState(dataSource);
   const theme = createTheme({
     palette: {
       primary: {
@@ -35,31 +47,38 @@ const EventCalendar: FC<Props> = ({
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <Paper
-        sx={{ width, border: '1px solid rgba(0, 0, 0, 0.12)' }}
-        elevation={elevation}
-      >
-        <Controls changeMonth={changeMonth} date={date} />
-        <Grid container>
-          {daysGrid?.map((item, i) =>
-            item?.no ? (
-              <Day
-                daysGridLength={daysGrid.length}
-                i={i}
-                item={item}
-                key={i}
-                events={dataSource?.filter((data) =>
-                  item.date.isSame(data?.date, 'day')
-                )}
-              />
-            ) : (
-              <ExtraDays daysGridLength={daysGrid.length} i={i} key={i} />
-            )
-          )}
-        </Grid>
-      </Paper>
-    </ThemeProvider>
+    <EventCalendarContext.Provider
+      value={{
+        readonly,
+        data,
+        setData,
+        onDataChange,
+      }}
+    >
+      <ThemeProvider theme={theme}>
+        <Paper
+          sx={{ width, border: '1px solid rgba(0, 0, 0, 0.12)' }}
+          elevation={elevation}
+        >
+          <Controls changeMonth={changeMonth} date={date} />
+          <Grid container>
+            {daysGrid?.map((item, i) =>
+              item?.no ? (
+                <Day
+                  daysGridLength={daysGrid.length}
+                  i={i}
+                  item={item}
+                  key={i}
+                  events={data?.filter((d) => item.date.isSame(d?.date, 'day'))}
+                />
+              ) : (
+                <ExtraDays daysGridLength={daysGrid.length} i={i} key={i} />
+              )
+            )}
+          </Grid>
+        </Paper>
+      </ThemeProvider>
+    </EventCalendarContext.Provider>
   );
 };
 

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { createTheme } from '@mui/material';
+import { EventCalendarContext } from './EventCalendar';
+import { useEffect, useMemo, useState, useContext } from 'react';
 import moment from 'moment';
 
-import { DaysGrid, Pallet } from './types';
+import { DaysGrid } from './types';
 
 export default function useEventCalendar() {
+  const context = useContext(EventCalendarContext);
   const [date, setDate] = useState(moment());
   const [daysGrid, setDaysGrid] = useState<Array<DaysGrid>>([]);
 
@@ -57,5 +58,5 @@ export default function useEventCalendar() {
     }
   };
 
-  return { changeMonth, daysGrid, date: d };
+  return { changeMonth, daysGrid, date: d, context };
 }
