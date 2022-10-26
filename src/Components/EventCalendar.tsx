@@ -13,6 +13,7 @@ interface Props {
   width?: number | string;
   dataSource?: EventsData;
   onDataChange?: (events: EventsData) => void;
+  showEventPopup?: boolean;
 }
 
 export type CalendarContext = {
@@ -20,6 +21,7 @@ export type CalendarContext = {
   data?: EventsData;
   setData?: React.Dispatch<React.SetStateAction<EventsData | undefined>>;
   onDataChange?: (events: EventsData) => void;
+  showEventPopup?: boolean;
 } | null;
 
 export const EventCalendarContext = createContext<CalendarContext>(null);
@@ -31,6 +33,7 @@ const EventCalendar: FC<Props> = ({
   width = '90%',
   dataSource,
   onDataChange,
+  showEventPopup = true,
 }) => {
   const { changeMonth, date, daysGrid } = useEventCalendar();
   const [data, setData] = useState(dataSource);
@@ -53,6 +56,7 @@ const EventCalendar: FC<Props> = ({
         data,
         setData,
         onDataChange,
+        showEventPopup,
       }}
     >
       <ThemeProvider theme={theme}>
